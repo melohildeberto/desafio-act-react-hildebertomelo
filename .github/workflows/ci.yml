@@ -1,0 +1,46 @@
+name: CI - React + Vite
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      # 1. Checkout do repositório
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # 2. Configuração do Node.js
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+
+      # 3. Instalação das dependências
+      - name: Install dependencies
+        run: npm install
+
+      # 4. Lint do código
+      - name: Run lint
+        run: npm run lint
+
+      # 5. Testes (se configurados)
+      - name: Run tests
+        run: npm test --if-present
+
+      # 6. Build do projeto
+      - name: Build project
+        run: npm run build
+
+      # 7. Artefato do build (opcional)
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: build
+          path: dist
