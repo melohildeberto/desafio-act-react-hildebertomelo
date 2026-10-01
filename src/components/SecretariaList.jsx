@@ -1,12 +1,16 @@
 import { useQuery } from "@tanstack/react-query";
 import { listarSecretarias, deletarSecretaria } from "../api/secretariaApi";
-import { List, ListItem, ListItemText, IconButton } from "@mui/material";
+import {
+  List, ListItem, ListItemText, ListItemAvatar, Avatar,
+  IconButton, Divider
+} from "@mui/material";
 import DeleteIcon from "@mui/icons-material/Delete";
 import { Link } from "react-router-dom";
 import { useState } from "react";
 import FeedbackDialog from "./FeedbackDialog";
 import ConfirmDialog from "./ConfirmDialog";
 import { useSnackbar } from "../context/SnackbarContext";
+import SecretariaForm from "./SecretariaForm";
 
 export default function SecretariaList() {
   const { data, refetch } = useQuery({
@@ -25,28 +29,16 @@ export default function SecretariaList() {
   };
 
   const confirmDelete = () => {
-    if (!selectedId) {
-      setDialog({ open: true, title: "Erro", message: "ID da secretaria é obrigatório", type: "error" });
-      showMessage("ID da secretaria é obrigatório", "error");
-      setConfirmOpen(false);
-      return;
-    }
-
     deletarSecretaria(selectedId)
       .then(() => {
-        setDialog({ open: true, title: "Sucesso", message: "Secretaria excluída!", type: "success" });
         showMessage("Secretaria excluída!", "success");
+        setDialog({ open: true, title: "Sucesso", message: "Secretaria excluída!", type: "success" });
         refetch();
       })
       .catch((err) => {
-        if (err.type === "validation") {
-          const msg = Object.values(err.data).join(", ");
-          setDialog({ open: true, title: "Erro de Validação", message: msg, type: "error" });
-          showMessage(msg, "error");
-        } else {
-          setDialog({ open: true, title: "Erro", message: err.message, type: "error" });
-          showMessage(err.message, "error");
-        }
+        const msg = err.type === "validation" ? Object.values(err.data).join(", ") : err.message || "Erro inesperado";
+        showMessage(msg, "error");
+        setDialog({ open: true, title: "Erro", message: msg, type: "error" });
       })
       .finally(() => setConfirmOpen(false));
   };
@@ -55,21 +47,31 @@ export default function SecretariaList() {
 
   return (
     <>
+      {/* Passa o refetch como prop */}
+      <SecretariaForm onCreated={refetch} />
+      
+
       <List>
-        {data.content.map((s) => (
-          <ListItem
-            key={s.id}
-            secondaryAction={
-              <IconButton edge="end" onClick={() => handleDeleteClick(s.id)}>
-                <DeleteIcon />
-              </IconButton>
-            }
-          >
-            <ListItemText
-              primary={<Link to={`/secretarias/${s.id}`}>{s.nome}</Link>}
-              secondary={s.email}
-            />
-          </ListItem>
+        {data.content.map((s, index) => (
+          <>
+            <ListItem
+              key={s.id}
+              secondaryAction={
+                <IconButton edge="end" color="error" onClick={() => handleDeleteClick(s.id)}>
+                  <DeleteIcon />
+                </IconButton>
+              }
+            >
+              <ListItemAvatar>
+                <Avatar>{s.nome.charAt(0)}</Avatar>
+              </ListItemAvatar>
+              <ListItemText
+                primary={<Link to={`/secretarias/${s.id}`}>{s.nome}</Link>}
+                secondary={`${s.email} | ${s.telefone || "Sem telefone"}`}
+              />
+            </ListItem>
+            {index < data.content.length - 1 && <Divider />}
+          </>
         ))}
       </List>
 

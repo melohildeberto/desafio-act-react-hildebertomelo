@@ -12,7 +12,6 @@ export default function SecretariasPage() {
   return (
     <div>
       <h1>Gestão de Secretarias</h1>
-      <SecretariaForm onCreated={handleCreated} />
       <SecretariaList />
     </div>
   );

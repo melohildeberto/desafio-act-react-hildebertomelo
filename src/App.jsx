@@ -1,28 +1,26 @@
-import { Routes, Route, Link } from "react-router-dom";
-import { AppBar, Toolbar, Typography, Button } from "@mui/material";
-import SecretariasPage from "./pages/SecretariasPage";
-import SecretariaPage from "./pages/SecretariaPage";
+import { Routes, Route, NavLink } from "react-router-dom";
+import HomePage from "./pages/HomePage";
+import SecretariaList from "./components/SecretariaList";
+import { AppBar, Toolbar, Button } from "@mui/material";
 
-function App() {
+export default function App() {
   return (
     <>
-      <AppBar position="static">
+      <AppBar position="static" sx={{ backgroundColor: "#1976d2" }}>
         <Toolbar>
-          <Typography variant="h6" sx={{ flexGrow: 1 }}>
-            Gestão de Secretarias
-          </Typography>
-          <Button color="inherit" component={Link} to="/">Home</Button>
-          <Button color="inherit" component={Link} to="/secretarias">Secretarias</Button>
+          <Button component={NavLink} to="/" sx={{ color: "white", mr: 2 }}>
+            HOME
+          </Button>
+          <Button component={NavLink} to="/secretarias" sx={{ color: "white" }}>
+            SECRETARIAS
+          </Button>
         </Toolbar>
       </AppBar>
 
       <Routes>
-        <Route path="/" element={<SecretariasPage />} />
-        <Route path="/secretarias" element={<SecretariasPage />} />
-        <Route path="/secretarias/:id" element={<SecretariaPage />} />
+        <Route path="/" element={<HomePage />} />
+        <Route path="/secretarias" element={<SecretariaList />} />
       </Routes>
     </>
   );
 }
-
-export default App;
